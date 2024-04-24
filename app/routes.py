@@ -1,7 +1,8 @@
 from flask import ( 
     Flask, 
     request,
-    render_template
+    render_template,
+    redirect
 )
 
 import requests
@@ -39,3 +40,26 @@ def detail(pk):
         render_template("error.html", err=response.status_code),
         response.status_code
     )
+
+@app.get("/tasks/new")
+def new_task():
+    return render_template("new.html")
+
+@app.post("/tasks/create")
+def create_task():
+    url = "%s" % (BACKEND_URL)
+    task_data = request.form
+    response = requests.post(url, json=task_data)
+    if response.status_code == 204:
+        return render_template("success.html")
+    return render_template("error.html", err=response.status_code), response.status_code
+
+@app.post("/tasks/delete/<int:pk>")
+def delete_task(pk):
+    url = "%s/%s" % (BACKEND_URL, pk)
+    task_status = {"is_done":1}
+    response = requests.put(url, json=task_status)
+    if response.status_code == 204:
+        return redirect("/tasks")
+    else:
+        return render_template("error.html", err=response.status_code), response.status_code

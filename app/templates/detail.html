@@ -7,4 +7,18 @@
 <h1>{{ task["name"] }}</h1>
 <h5>{{ task["summary"] }}</h5>
 <p>Description: {{ task["description"] }}</p>
+<form id="deactivateForm" action="{{ url_for('delete_task', pk=task['id']) }}" method="POST">
+    <input type="hidden" name="_method" value="PUT">
+    <button type="submit" class="btn btn-outline-danger" onclick="confirmDeactivation()">
+        <i class="bi bi-trash"></i>
+    </button>
+</form>
+<script>
+    function confirmDeactivation() {
+        if (confirm("Are you sure you want to deactivate this task?")) {
+            document.getElementById("deactivateForm").submit();
+        }
+    }
+</script>
+
 {% endblock content %}
