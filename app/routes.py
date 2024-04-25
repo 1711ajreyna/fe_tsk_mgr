@@ -41,6 +41,30 @@ def detail(pk):
         response.status_code
     )
 
+@app.get("/tasks/edit/<int:pk>")
+def edit_task(pk):
+    url ="%s/%s" % (BACKEND_URL, pk)
+    response = requests.get(url)
+    if response.status_code == 200:
+        task = response.json().get("task")
+        return render_template("edit.html", task=task)
+    return (
+        render_template("error.html", err=response.status_code),
+        response.status_code
+    )
+
+@app.post("/tasks/edit/<int:pk>")
+def submit_task_update(pk):
+    url="%s/%s" % (BACKEND_URL, pk)
+    task_data = request.form
+    response = requests.put(url, json=task_data)
+    if response.status_code == 204:
+        return render_template("success.html", msg="Task updated successfully.")
+    return (
+        render_template("error.html", err=response.status_code),
+        response.status_code
+    )
+
 @app.get("/tasks/new")
 def new_task():
     return render_template("new.html")
@@ -52,7 +76,10 @@ def create_task():
     response = requests.post(url, json=task_data)
     if response.status_code == 204:
         return render_template("success.html")
-    return render_template("error.html", err=response.status_code), response.status_code
+    return (
+        render_template("error.html", err=response.status_code), 
+        response.status_code
+    )
 
 @app.post("/tasks/delete/<int:pk>")
 def delete_task(pk):
@@ -62,4 +89,7 @@ def delete_task(pk):
     if response.status_code == 204:
         return redirect("/tasks")
     else:
-        return render_template("error.html", err=response.status_code), response.status_code
+        return (
+            render_template("error.html", err=response.status_code), 
+            response.status_code
+        )
